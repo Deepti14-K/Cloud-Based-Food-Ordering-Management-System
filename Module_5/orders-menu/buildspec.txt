@@ -1,0 +1,23 @@
+version 0.2
+
+phases
+  pre_build
+    commands
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - aws ecr get-login-password --region us-east-2  docker login --username AWS --password-stdin 000953148506.dkr.ecr.us-east-2.amazonaws.com
+      - REPOSITORY_URI=000953148506.dkr.ecr.us-east-2.amazonaws.comorders-ecr-repository
+  build
+    commands
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t $REPOSITORY_URIlatest .
+  post_build
+    commands
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URIlatest
+      - echo Writing image definitions file...
+      - printf '[{nameorders-menu-container,imageUri%s}]' $REPOSITORY_URIlatest  imagedefinitions.json
+artifacts
+    files imagedefinitions.json
